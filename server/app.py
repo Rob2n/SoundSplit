@@ -1,24 +1,28 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, send_file
 from werkzeug.utils import secure_filename
+from redis import Redis
+import rq
 
-app = Flask(__name__)
-
-UPLOAD_FOLDER = '.'
+UPLOAD_FOLDER = 'uploaded'
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 
+app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = '5UC3M35C0U17735'
 
+def split_this_song(song_path):
+	# print(UPLOAD_FOLDER + '/' + song_path)
+	os.system("spleeter separate -i " + UPLOAD_FOLDER + '/' + song_path + " -p spleeter:2stems -o output")
 
 def allowed_file(filename):
 	return '.' in filename and \
 		   filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/uploads/<filename>')
+@app.route('/uploaded/<filename>')
 def uploaded_file(filename):
 	# os.system("spleeter separate -i " + filename + " -p spleeter:2stems -o output")
-	return send_from_directory("./output", filename)
-	# return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/<path:req_path>')
 def dir_listing(req_path):
@@ -48,8 +52,11 @@ def upload_file():
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			return redirect(url_for('uploaded_file',
-									filename=filename))
+			flash('FILE UPLOADED')
+			queue = rq.Queue('split', connection=Redis.from_url('redis://'))
+			job = queue.enqueue(split_this_song, filename)
+			return redirect(request.url)
+			# return redirect(url_for('uploaded_file', filename=filename))
 	return '''
 	<!doctype html>
 	<title>Upload new File</title>
