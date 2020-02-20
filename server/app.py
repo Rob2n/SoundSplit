@@ -12,8 +12,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = '5UC3M35C0U17735'
 
 def split_this_song(song_path):
-	# print(UPLOAD_FOLDER + '/' + song_path)
 	os.system("spleeter separate -i " + UPLOAD_FOLDER + '/' + song_path + " -p spleeter:2stems -o output")
+
+def redirect_done(job_id):
+	# job = Job.fetch(job_id)
+	# while job.is_finished == False:
+	# print(job.get_status())
+	return redirect(url_for('dir_listing', req_path='output'))
 
 def allowed_file(filename):
 	return '.' in filename and \
@@ -21,18 +26,14 @@ def allowed_file(filename):
 
 @app.route('/uploaded/<filename>')
 def uploaded_file(filename):
-	# os.system("spleeter separate -i " + filename + " -p spleeter:2stems -o output")
 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/<path:req_path>')
 def dir_listing(req_path):
 	BASE_DIR = '.'
-	# Joining the base and the requested path
 	abs_path = os.path.join(BASE_DIR, req_path)
-	# Check if path is a file and serve
 	if os.path.isfile(abs_path):
 		return send_file(abs_path)
-	# Show directory contents
 	files = os.listdir(abs_path)
 	return render_template('index.html', files=files)
 
@@ -52,10 +53,9 @@ def upload_file():
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			flash('FILE UPLOADED')
 			queue = rq.Queue('split', connection=Redis.from_url('redis://'))
-			job = queue.enqueue(split_this_song, filename)
-			return redirect(request.url)
+			split_job = queue.enqueue(split_this_song, filename)
+			return redirect(url_for('dir_listing', req_path='output'))
 			# return redirect(url_for('uploaded_file', filename=filename))
 	return '''
 	<!doctype html>
