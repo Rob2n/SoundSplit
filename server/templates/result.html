@@ -1,3 +1,19 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>SoundSplit</title>
+	</head>
+	<body>
+		<ul>
+			{% for file in files %}
+			<li><a href="/output/{{ file }}">{{ file }}</a></li>
+			{% endfor %}
+		</ul>
+	</body>
+</html> -->
+
 <html>
 	<head>
 		<meta charset="utf-8" />
@@ -18,20 +34,27 @@
 		transform: translateX(-50%) translateY(-50%);">
 			<div class="mui-panel">
 				<h1>SoundSplit</h1>
-				<form  method=post enctype=multipart/form-data>
-					<legend>Choose a sound to split</legend>
-					
-						<input
-							accept="audio/*"
-							name="file"
-							id="raised-button-file"
-							type="file"
-						/>
-					
-					<button class="mui-btn mui-btn--primary mui-btn--raised" type=submit value=Upload>
-						Start Processing
-					</button>
-				</form>
+				<h2>Processed files</h2>
+				<table class="mui-table">
+					<thead>
+						<tr>
+							<th>File name</th>
+							<th>File extension</th>
+							<th>Size</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+                        {% for file in files %}
+						<tr>
+							<td>Filename</td>
+							<td>Cell 1-2</td>
+							<td>Cell 1-2</td>
+							<td>Cell 1-2</td>
+                        </tr>
+                        {% endfor %}
+					</tbody>
+				</table>
 			</div>
 		</div>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.3/particles.min.js"></script>
