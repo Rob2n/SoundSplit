@@ -45,14 +45,14 @@
 						</tr>
 					</thead>
 					<tbody>
-                        {% for file in files %}
+						{% for file in files %}
 						<tr>
-							<td>Filename</td>
-							<td>Cell 1-2</td>
-							<td>Cell 1-2</td>
-							<td>Cell 1-2</td>
-                        </tr>
-                        {% endfor %}
+							<td>{{ file['name'] }}</td>
+							<td>{{ file['ext'] }}</td>
+							<td>{{ file['size'] }}</td>
+							<td><a href="{{ file['action'] }}">Download</a></td>
+						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</div>
