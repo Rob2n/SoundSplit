@@ -1,3 +1,4 @@
+![Logo](https://github.com/Rob2n/SoundSplit/blob/master/soundsplit.png "SoundSplit is awesome :)")
 # SoundSplit
 #### Track splitting for everyone
 ***
